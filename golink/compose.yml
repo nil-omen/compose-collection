@@ -1,0 +1,10 @@
+services:
+  golink:
+    image: ghcr.io/tailscale/golink:main
+    container_name: golink
+    restart: unless-stopped
+    user: root
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY}
+    volumes:
+      - $HOME/podman/golink/data:/home/nonroot:Z
