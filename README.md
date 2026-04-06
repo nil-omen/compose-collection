@@ -1,5 +1,4 @@
 # Compose Files Collection
 
 This repo is for my compose files.
-Currently running on podman on my local Fedora server while learning DevOps and Podman.
-That's why it has some podman and Fedora *SELinux* tweaks.
+While learning about Docker, Podman, Compose files, and containers in general on my homelap.

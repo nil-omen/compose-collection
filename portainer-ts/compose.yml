@@ -28,8 +28,8 @@ services:
             - source: ts-serve
               target: /config/serve.json
         volumes:
-            - ./config:/config # Config folder used to store Tailscale files - you may need to change the path
-            - ./ts/state:/var/lib/tailscale # Tailscale requirement - you may need to change the path
+            - ${DATA_DIR}/${SERVICE}/ts/config:/config # Config folder used to store Tailscale files - you may need to change the path
+            - ${DATA_DIR}/${SERVICE}/ts/state:/var/lib/tailscale # Tailscale requirement - you may need to change the path
         devices:
             - /dev/net/tun:/dev/net/tun # Network configuration for Tailscale to work
         cap_add:
@@ -64,7 +64,7 @@ services:
             - TZ=Africa/Cairo
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
-            - ./${SERVICE}-data/portainer_data:/data
+            - ${DATA_DIR}/${SERVICE}/${SERVICE}-data/portainer_data:/data
         depends_on:
             tailscale:
                 condition: service_healthy

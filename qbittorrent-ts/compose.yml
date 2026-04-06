@@ -59,12 +59,21 @@ services:
         network_mode: service:tailscale # Sidecar configuration to route ${SERVICE} through Tailscale
         container_name: app-${SERVICE} # Name for local container management
         environment:
-            ROCKET_PORT: "8080" # Set a different port than :80 to avoid conflict and let tailscale handle tls certifiactes
-            # DOMAIN: "https://vaultwarden.example.com"  # required when using a reverse proxy; your domain; vaultwarden needs to know it's https to work properly with attachments
-            SIGNUPS_ALLOWED: "true" # Deactivate this with "false" after you have created your account so that no strangers can register
+            - PUID=1000
+            - PGID=1000
+            - TZ=Africa/Cairo
+            - WEBUI_PORT=8080
+            # - TORRENTING_PORT=6881 #optional
         volumes:
-            - ${DATA_DIR}/${SERVICE}/${SERVICE}-data/vw-data:/data
+            - ${DATA_DIR}/${SERVICE}/${SERVICE}-data/config:/config
+            - ${DATA_DIR}/${SERVICE}/${SERVICE}-data/downloads:/downloads
         depends_on:
             tailscale:
                 condition: service_healthy
+        healthcheck:
+            test: ["CMD", "pgrep", "-f", "${SERVICE}"] # Check if ${SERVICE} process is running
+            interval: 1m # How often to perform the check
+            timeout: 10s # Time to wait for the check to succeed
+            retries: 3 # Number of retries before marking as unhealthy
+            start_period: 30s # Time to wait before starting health checks
         restart: unless-stopped
