@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+    uptime-kuma:
+        image: docker.io/louislam/uptime-kuma:2
+        container_name: uptime-kuma
+        restart: unless-stopped
+        environment:
+            - TZ=${TZ}
+        ports:
+            - "3001:3001"
+        volumes:
+            # This bind mount maps host path -> container path
+            - ${DATA_DIR}/main:/app/data
+            # Read-only access to the Docker socket for container monitoring
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+            # Map the host's Podman socket to the container's Docker socket
+            # - /run/podman/podman.sock:/var/run/docker.sock:ro
+
+    uptime-kuma-t3mia:
+        image: docker.io/louislam/uptime-kuma:2
+        container_name: uptime-kuma-t3mia
+        restart: unless-stopped
+        environment:
+            - TZ=${TZ}
+        ports:
+            - "3002:3001"
+        volumes:
+            # This binds to a separate folder for t3mia
+            - ${DATA_DIR}/t3mia:/app/data
