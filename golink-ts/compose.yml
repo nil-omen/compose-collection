@@ -7,4 +7,4 @@ services:
         environment:
             - TS_AUTHKEY=${TS_AUTHKEY}
         volumes:
-            - ${DATA_DIR}/golink/data:/home/nonroot:Z
+            - ${DATA_DIR}/golink/data:/home/nonroot
