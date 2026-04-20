@@ -1,0 +1,51 @@
+services:
+    tailscale:
+        image: tailscale/tailscale:latest
+        container_name: ts-${SERVICE}
+        hostname: ${SERVICE}
+        environment:
+            - TS_AUTHKEY=${TS_AUTHKEY}
+            - TS_STATE_DIR=/var/lib/tailscale
+            - TS_EXTRA_ARGS=--advertise-tags=tag:container
+            - TS_ACCEPT_DNS=true
+            - TS_USERSPACE=false
+            - TS_ENABLE_HEALTH_CHECK=true
+            - TS_LOCAL_ADDR_PORT=127.0.0.1:41234
+        volumes:
+            - ${DATA_DIR}/${SERVICE}/ts/state:/var/lib/tailscale
+
+        devices:
+            - /dev/net/tun:/dev/net/tun
+        cap_add:
+            - NET_ADMIN
+            - SYS_MODULE
+        healthcheck:
+            test:
+                [
+                    "CMD",
+                    "wget",
+                    "--spider",
+                    "-q",
+                    "http://127.0.0.1:41234/healthz",
+                ]
+            interval: 1m
+            timeout: 10s
+            retries: 3
+            start_period: 10s
+        restart: unless-stopped
+
+    runner:
+        image: data.forgejo.org/forgejo/runner:12
+        container_name: app-${SERVICE}
+        network_mode: service:tailscale
+        depends_on:
+            tailscale:
+                condition: service_healthy
+        user: root
+        working_dir: /data
+        volumes:
+            - ${DATA_DIR}/${SERVICE}/data:/data
+            - /var/run/docker.sock:/var/run/docker.sock
+        command:
+            ["/bin/forgejo-runner", "daemon", "--config", "/data/config.yml"]
+        restart: unless-stopped
